@@ -5,7 +5,7 @@ After=multi-user.target
 [Service]
 Type=simple
 User=vanslipon
-ExecStart=sh /home/vanslipon/develop/Custos/code/server.py
+ExecStart=python /home/vanslipon/develop/Custos/code/server.py
 Restart=on-abort
 
 [Install]
