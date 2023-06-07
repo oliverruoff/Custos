@@ -71,7 +71,7 @@ def remote():
 def gen():
     while True:
         with io.BytesIO() as output:
-            camera.capture(output, format='jpeg', use_video_port=True, quality=20, resize=(640, 480))
+            camera.capture(output, format='jpeg', use_video_port=True, quality=10, resize=(512, 384))
             frame = output.getvalue()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')

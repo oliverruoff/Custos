@@ -13,7 +13,7 @@
 </head>
 
 <body>
-  <div id="imgDiv" style="width:640px;height:480px;margin:10px auto;">
+  <div id="imgDiv" style="width:512px;height:384px;margin:10px auto;">
     <img id="img_id" src="{{ url_for('video_feed') }}" style="position:relative;">
   </div>
   <div style="width: 100%;text-align: center;">
@@ -147,7 +147,7 @@
       
       function updateVoltage() {
         console.log("Updating voltage")
-        fetch("http://custos:5000/get_voltage")
+        fetch("http://localhost:5000/get_voltage")
           .then(response => response.json())
           .then(data => {
             voltageField.value = data.value;
