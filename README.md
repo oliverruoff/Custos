@@ -23,9 +23,9 @@ Small robot with belt-drive.
 * Change `ExecStart=` command inside `*.service` accordingly to path where `server.py` is located
 * Enable daemon process
     * $ `sudo systemctl daemon-reload`
-    * $ `sudo systemctl enable remote.service`
-    * $ `sudo systemctl start remote.service`
-* Enable daily reboot at 4am (to automatically fix (e.g.) networking errors
+    * $ `sudo systemctl enable robot.service`
+    * $ `sudo systemctl start robot.service`
+* Enable daily reboot at 4am (to automatically fix (e.g.) networking errors)
   * `sudo crontab -e`
   * Enter as new line and save --> `0 4 * * * /sbin/reboot`
 
