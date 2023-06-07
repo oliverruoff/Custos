@@ -146,6 +146,7 @@
     const voltageField = document.getElementById("voltage");
       
       function updateVoltage() {
+        console.log("Updating voltage")
         fetch("http://solarbot:5000/get_voltage")
           .then(response => response.json())
           .then(data => {
