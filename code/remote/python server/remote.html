@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>SolarBot Remote</title>
+  <style>
+    body {
+      margin: 0px;
+      padding: 0px;
+      background-color: rgb(34, 34, 34);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="imgDiv" style="width:640px;height:480px;margin:10px auto;">
+    <img id="img_id" src="{{ url_for('video_feed') }}" style="position:relative;">
+  </div>
+  <div style="width: 100%;text-align: center;">
+    <div style="margin: 0 auto;">
+      <button onmousedown="move('forward')" onmouseup="move('stop')" id="buttonUp"
+        style="width:50px;height:50px;margin:1px;">▲</button>
+      <br>
+      <button onmousedown="move('left')" onmouseup="move('stop')"" id="buttonLeft"
+        style="width:50px;height:50px;margin:1px;">◄</button>
+      <button onmousedown="move('backward')" onmouseup="move('stop')"" id="buttonDown"
+        style="width:50px;height:50px;margin:1px;">▼</button>
+      <button onmousedown="move('right')" onmouseup="move('stop')"" id="buttonRight"
+        style="width:50px;height:50px;margin:1px;">►</button>
+      <br>
+      <input type="range" min="1" max="100" value="50" class="slider" id="slider">
+      <br>
+      <input type="text" id="voltage" disabled>
+    </div>
+  </div>
+  </div>
+  <script type="text/javascript">
+    keyControl = false;
+    keysPressed = [];
+    var oldUrl = ""
+    old_keysPressed = [];
+    const slider = document.getElementById("slider");
+
+    function control_servo(angle_degree) {
+      console.log("Moving servo to angle (in degree):" + angle_degree)
+      httpGet("{{ url_for('control_servo') }}?angle_degree="+angle_degree)
+    }
+
+    function move(mode) {
+      console.log('Button Pressed: ', mode)
+      speed_val = slider.value
+      if (mode == "forward") {
+        httpGet("{{ url_for('move') }}?left_speed="+speed_val+"&right_speed="+speed_val)
+      } else if (mode == "backward") {
+        httpGet("{{ url_for('move') }}?left_speed=-"+speed_val+"&right_speed=-"+speed_val)
+      } else if (mode == "left") {
+        httpGet("{{ url_for('move') }}?left_speed=-"+speed_val+"&right_speed="+speed_val)
+      } else if (mode == "right") {
+        httpGet("{{ url_for('move') }}?left_speed="+speed_val+"&right_speed=-"+speed_val)
+      } else if (mode == "curve_forward_left") {
+        httpGet("{{ url_for('move') }}?left_speed="+parseFloat(speed_val-20)+"&right_speed="+speed_val)
+      } else if (mode == "curve_forward_right") {
+        httpGet("{{ url_for('move') }}?left_speed="+speed_val+"&right_speed="+parseFloat(speed_val-20))
+      } else if (mode == "curve_backward_left") {
+        httpGet("{{ url_for('move') }}?left_speed="+parseFloat(-speed_val+20)+"&right_speed="+parseFloat(-speed_val))
+      } else if (mode == "curve_backward_right") {
+        httpGet("{{ url_for('move') }}?left_speed="+(parseFloat(-speed_val)+"&right_speed="+parseFloat(-speed_val+20)))
+      } else if (mode == "stop") {
+        httpGet("{{ url_for('move') }}?left_speed=0&right_speed=0")
+      }
+    }
+
+    function reactToKeysPressed() {
+      console.log('KeysPressed: ', keysPressed)
+      console.log('Old keys pressed: ', old_keysPressed)
+
+      if (arraysEqual(old_keysPressed, keysPressed)) {
+        console.log('Same key combination, doing nothing.')
+        return
+      } else {
+        old_keysPressed = keysPressed.slice()
+      }
+
+      if (keysPressed.length == 1) {
+        if ((keysPressed.indexOf('KeyW') >= 0 || keysPressed.indexOf('ArrowUp') >= 0)) {
+          move('forward')
+        } else if ((keysPressed.indexOf('KeyS') >= 0 || keysPressed.indexOf('ArrowDown')) >= 0) {
+          move('backward')
+        } else if ((keysPressed.indexOf('KeyA') >= 0 || keysPressed.indexOf('ArrowLeft')) >= 0) {
+          move('left')
+        } else if ((keysPressed.indexOf('KeyD') >= 0 || keysPressed.indexOf('ArrowRight')) >= 0) {
+          move('right')
+        }
+      } else if (keysPressed.length == 2) {
+        if ((keysPressed.indexOf('ArrowUp') >= 0 && keysPressed.indexOf('ArrowRight') >= 0) ||
+          keysPressed.indexOf('KeyW') >= 0 && keysPressed.indexOf('KeyD') >= 0) {
+            move('curve_forward_right')
+        } else if ((keysPressed.indexOf('ArrowUp') >= 0 && keysPressed.indexOf('ArrowLeft') >= 0) ||
+          keysPressed.indexOf('KeyW') >= 0 && keysPressed.indexOf('KeyA') >= 0) {
+            move('curve_forward_left')
+        } else if ((keysPressed.indexOf('ArrowDown') >= 0 && keysPressed.indexOf('ArrowLeft') >= 0) ||
+          keysPressed.indexOf('KeyS') >= 0 && keysPressed.indexOf('KeyA') >= 0) {
+            move('curve_backward_left')
+        } else if ((keysPressed.indexOf('ArrowDown') >= 0 && keysPressed.indexOf('ArrowRight') >= 0) ||
+          keysPressed.indexOf('KeyS') >= 0 && keysPressed.indexOf('KeyD') >= 0) {
+            move('curve_backward_right')
+        }
+      }  else if (keysPressed.length == 0) {
+        move('stop')
+      }  else {
+        console.log('Too many buttons pressed!');
+      }
+    }
+
+  function arraysEqual(a, b) {
+    if (a.length !== b.length) {
+      return false;
+    }
+
+    return a.every((element) => b.includes(element));
+  }
+    document.addEventListener('keydown', function(event) {
+      console.log('Key down:', event.code)
+      if (keysPressed.indexOf(event.code) < 0) {
+        keysPressed.push(event.code)
+      }
+      reactToKeysPressed();
+    });
+    document.addEventListener('keyup', function(event) {
+      console.log('Key up:', event.code)
+      indexToDelete = keysPressed.indexOf(event.code);
+      if (indexToDelete >= 0) {
+        keysPressed.splice(indexToDelete, 1)
+      }
+      reactToKeysPressed();
+    });
+
+    function httpGet(theUrl) {
+      console.log(theUrl)
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.open("GET", theUrl, false); // false for synchronous request
+      xmlHttp.send(null);
+      return xmlHttp.responseText;
+    }
+
+    const voltageField = document.getElementById("voltage");
+      
+      function updateVoltage() {
+        fetch("http://solarbot:5000/get_voltage")
+          .then(response => response.json())
+          .then(data => {
+            voltageField.value = data.value;
+          })
+          .catch(error => console.error(error));
+      }
+      
+      setInterval(updateVoltage, 5000);
+  </script>
+</body>
+
+</html>
