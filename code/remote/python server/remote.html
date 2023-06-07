@@ -147,7 +147,7 @@
       
       function updateVoltage() {
         console.log("Updating voltage")
-        fetch("http://localhost:5000/get_voltage")
+        fetch("http://custos:5000/get_voltage")
           .then(response => response.json())
           .then(data => {
             voltageField.value = data.value;
