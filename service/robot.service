@@ -1,0 +1,12 @@
+[Unit]
+Description=Robot server to control the robot.
+After=multi-user.target
+
+[Service]
+Type=simple
+User=vanslipon
+ExecStart=sh /home/vanslipon/develop/Custos/code/server.py
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
