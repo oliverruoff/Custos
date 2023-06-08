@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <!-- Wenn du benutzerdefinierte Zertifikate verwendest, füge sie hier hinzu -->
+            <!-- Ansonsten werden die Standardvertrauensanker verwendet -->
+            <!-- <certificates src="system" /> -->
+        </trust-anchors>
+    </base-config>
+</network-security-config>

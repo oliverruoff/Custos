@@ -3,6 +3,11 @@ Small robot with belt-drive.
 
 ![custos](docs/custos.png)
 
+## Wear OS control
+
+Featuring a wear os app, to control it with my Pixel Watch:
+![wear os control](docs/wear_os.png)
+
 ## Wiring
 
 - INA219:
